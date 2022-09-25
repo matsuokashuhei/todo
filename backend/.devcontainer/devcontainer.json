@@ -1,0 +1,27 @@
+{
+  "name": "backend",
+  "dockerComposeFile": ["../../compose.yml"],
+  "service": "backend",
+  "shutdownAction": "none",
+  "workspaceFolder": "/app/backend",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "rust-lang.rust-analyzer",
+        "mhutchie.git-graph",
+        "donjayamanne.githistory",
+        "be5invis.toml"
+      ],
+      "settings": {
+        "files.insertFinalNewline": true,
+        "files.trimFinalNewlines": true,
+        "files.trimTrailingWhitespace": true,
+        "editor.formatOnSave": true,
+        "workbench.editor.enablePreview": false,
+        "workbench.editor.enablePreviewFromQuickOpen": false,
+        "terminal.integrated.scrollback": 10000,
+        "rust-analyzer.trace.extension": true
+      }
+    }
+  }
+}

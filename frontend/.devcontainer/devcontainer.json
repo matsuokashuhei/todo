@@ -1,0 +1,58 @@
+{
+  "name": "frontend",
+  "dockerComposeFile": ["../../compose.yml"],
+  "service": "frontend",
+  "shutdownAction": "none",
+  "workspaceFolder": "/app/frontend",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "bradlc.vscode-tailwindcss",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode"
+      ],
+      "settings": {
+        "editor.codeActionsOnSave": {
+          "source.fixAll": true,
+          "source.organizeImports": true
+        },
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true,
+        "files.insertFinalNewline": true,
+        "files.trimTrailingWhitespace": true,
+        "files.trimFinalNewlines": true,
+        "eslint.validate": [
+          "javascript",
+          "javascriptreact",
+          "typescript",
+          "typescriptreact"
+        ]
+      }
+    }
+  }
+  //   "editor.defaultFormatter": "esbenp.prettier-vscode",
+  //   "files.insertFinalNewline": true,
+  //   "files.trimFinalNewlines": true,
+  //   "files.trimTrailingWhitespace": true,
+  //   "editor.codeActionsOnSave": {
+  //     "source.fixAll": true,
+  //     "source.organizeImports": false
+  //   },
+  //   "editor.formatOnSave": true,
+  //   "workbench.editor.enablePreview": false,
+  //   "workbench.editor.enablePreviewFromQuickOpen": false,
+  //   "workbench.tree.indent": 16,
+  //   "[javascript]": {
+  //     "editor.tabSize": 2
+  //   },
+  //   "eslint.validate": [
+  //     "javascript",
+  //     "javascriptreact",
+  //     "typescript",
+  //     "typescriptreact"
+  //   ],
+  //   "tailwindCSS.emmetCompletions": true,
+  //   "tailwindCSS.includeLanguages": {
+  //     "plaintext": "javascript"
+  //   }
+}
