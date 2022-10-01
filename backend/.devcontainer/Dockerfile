@@ -4,5 +4,5 @@ FROM rust:1.64.0
 
 RUN <<EOT
 rustup component add rustfmt
-cargo install cargo-watch
+cargo install cargo-watch sea-orm-cli
 EOT
