@@ -6,3 +6,11 @@ RUN <<EOT
 rustup component add rustfmt
 cargo install cargo-watch sea-orm-cli
 EOT
+
+# ENV sourcedir=backend
+# ENV workdir=/app/backend
+# WORKDIR $workdir 
+# COPY $sourcedir/Cargo.toml $sourcedir/Cargo.lock $workdir
+# COPY $sourcedir/api/Cargo.toml $workdir/api/
+# RUN cargo build
+# COPY $sourcedir $workdir
