@@ -1,3 +1,4 @@
+use chrono::{DateTime, NaiveDateTime, Utc};
 use sea_orm_migration::prelude::*;
 
 #[derive(DeriveMigrationName)]
@@ -6,9 +7,6 @@ pub struct Migration;
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-        // Replace the sample below with your own migration scripts
-        // todo!();
-
         manager
             .create_table(
                 Table::create()
@@ -22,8 +20,8 @@ impl MigrationTrait for Migration {
                             .primary_key(),
                     )
                     .col(ColumnDef::new(Users::Name).string().not_null())
-                    .col(ColumnDef::new(Users::CreatedAt).date_time().not_null())
-                    .col(ColumnDef::new(Users::UpdatedAt).date_time().not_null())
+                    // .col(ColumnDef::new(Users::CreatedAt).timestamp().not_null())
+                    // .col(ColumnDef::new(Users::UpdatedAt).timestamp().not_null())
                     .to_owned(),
             )
             .await
