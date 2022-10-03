@@ -52,9 +52,9 @@ impl MigrationTrait for Migration {
 /// Learn more at https://docs.rs/sea-query#iden
 #[derive(Iden)]
 enum Users {
-    Table,
-    Id,
-    Name,
-    CreatedAt,
-    UpdatedAt,
+    // Table,
+    // Id,
+    // Name,
+    // CreatedAt,
+    // UpdatedAt,
 }

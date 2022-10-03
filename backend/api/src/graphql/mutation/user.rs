@@ -1,5 +1,3 @@
-use std::f32::consts::E;
-
 use crate::db::Database;
 use async_graphql::{Context, Object, Result};
 use entity::async_graphql::{self, InputObject};
