@@ -1,4 +1,3 @@
-mod db;
 mod graphql;
 use entity::async_graphql;
 

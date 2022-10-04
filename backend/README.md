@@ -12,6 +12,11 @@
 
 - [Rust Async-GraphQL Example: Caster API](https://github.com/bkonkle/rust-example-caster-api)
 
+# Documents
+
+- [Async-graphql Book](https://async-graphql.github.io/async-graphql/)
+- [SeaORM](https://www.sea-ql.org/SeaORM/docs/index/)
+
 # ER diagram
 
 ```mermaid

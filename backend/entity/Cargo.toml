@@ -9,6 +9,7 @@ name = "entity"
 path = "src/lib.rs"
 
 [dependencies]
+db = {path = "../db"}
 serde = {version = "1.0.85", features = ["derive"]}
 
 [dependencies.async-graphql]

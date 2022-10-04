@@ -1,11 +1,9 @@
 [package]
 edition = "2021"
-name = "backend"
+name = "db"
 version = "0.1.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-[workspace]
-members = [".", "api", "db", "entity", "migration"]
 
 [dependencies]
-api = {path = "api"}
+sea-orm = {version = "0.9.3", features = ["debug-print", "sqlx-mysql", "runtime-tokio-native-tls", "macros"]}
