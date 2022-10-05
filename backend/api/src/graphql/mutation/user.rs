@@ -1,5 +1,5 @@
+use crate::db::Database;
 use async_graphql::{Context, Object, Result};
-use db::Database;
 use entity::async_graphql::{self, InputObject};
 use entity::user;
 use sea_orm::{DbErr, EntityTrait, Set};
