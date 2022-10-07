@@ -1,6 +1,5 @@
-mod db;
 mod graphql;
-use entity::async_graphql;
+use repository::async_graphql;
 
 use async_graphql::http::GraphiQLSource;
 use async_graphql_axum::{GraphQLRequest, GraphQLResponse};

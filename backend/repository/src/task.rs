@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel, Serialize, Deserialize, SimpleObject)]
 #[sea_orm(table_name = "tasks")]
+#[graphql(concrete(name = "Task", params()))]
 pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i32,

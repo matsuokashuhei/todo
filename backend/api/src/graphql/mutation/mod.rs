@@ -1,4 +1,4 @@
-use entity::async_graphql;
+use repository::async_graphql;
 
 pub mod user;
 pub use user::UserMutation;

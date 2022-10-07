@@ -1,4 +1,3 @@
-// use entity::async_graphql;
 pub mod user;
 pub use user::UserQuery;
 
