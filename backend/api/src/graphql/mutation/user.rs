@@ -1,9 +1,10 @@
-use std::f32::consts::E;
-
-use crate::db::Database;
+// use crate::db::Database;
 use async_graphql::{Context, Object, Result};
-use entity::async_graphql::{self, InputObject};
-use entity::user;
+use repository::{
+    async_graphql::{self, InputObject},
+    db::Database,
+    user,
+};
 use sea_orm::{DbErr, EntityTrait, Set};
 
 #[derive(InputObject)]

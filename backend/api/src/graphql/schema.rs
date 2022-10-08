@@ -1,6 +1,7 @@
-use crate::db::Database;
 use crate::graphql::{mutation::Mutation, query::Query};
-use async_graphql::{EmptyMutation, EmptySubscription, Schema};
+use async_graphql::{EmptySubscription, Schema};
+use repository::db::Database;
+// use crate::db::Database;
 
 pub type AppSchema = Schema<Query, Mutation, EmptySubscription>;
 
