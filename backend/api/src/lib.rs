@@ -4,6 +4,7 @@ use repository::async_graphql;
 
 use async_graphql::http::GraphiQLSource;
 use async_graphql_axum::{GraphQLRequest, GraphQLResponse};
+use authority::Claims;
 use axum::{
     middleware,
     response::{Html, IntoResponse},
@@ -14,8 +15,13 @@ use graphql::schema::{build_schema, AppSchema};
 use repository::db::Database;
 use tower::ServiceBuilder;
 
-async fn graphql_handler(schema: Extension<AppSchema>, req: GraphQLRequest) -> GraphQLResponse {
-    schema.execute(req.into_inner()).await.into()
+async fn graphql_handler(
+    Extension(claims): Extension<Claims>,
+    schema: Extension<AppSchema>,
+    req: GraphQLRequest,
+) -> GraphQLResponse {
+    // req.0.data(claims)
+    schema.execute(req.0.data(claims)).await.into()
 }
 
 async fn graphql_playground() -> impl IntoResponse {
