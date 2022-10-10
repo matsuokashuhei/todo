@@ -1,7 +1,5 @@
 mod authority;
 mod graphql;
-use repository::async_graphql;
-
 use async_graphql::http::GraphiQLSource;
 use async_graphql_axum::{GraphQLRequest, GraphQLResponse};
 use authority::Claims;
@@ -12,16 +10,21 @@ use axum::{
     Extension, Router,
 };
 use graphql::schema::{build_schema, AppSchema};
+use repository::async_graphql;
 use repository::db::Database;
 use tower::ServiceBuilder;
 
 async fn graphql_handler(
-    Extension(claims): Extension<Claims>,
+    Extension(claims): Extension<Option<Claims>>,
     schema: Extension<AppSchema>,
     req: GraphQLRequest,
 ) -> GraphQLResponse {
+    if let Some(claims) = claims {
+        schema.execute(req.0.data(claims)).await.into()
+    } else {
+        schema.execute(req.into_inner()).await.into()
+    }
     // req.0.data(claims)
-    schema.execute(req.0.data(claims)).await.into()
 }
 
 async fn graphql_playground() -> impl IntoResponse {
@@ -39,7 +42,7 @@ async fn start() -> anyhow::Result<()> {
     let schema = build_schema(database).await;
     let app = Router::new()
         .route("/", get(graphql_playground).post(graphql_handler))
-        .route_layer(middleware::from_fn(authority::authenticate_user))
+        .route_layer(middleware::from_fn(authority::verify_token))
         .layer(ServiceBuilder::new().layer(Extension(schema)));
     axum::Server::bind(&"0.0.0.0:3000".parse().unwrap())
         .serve(app.into_make_service())

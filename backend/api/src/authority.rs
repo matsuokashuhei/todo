@@ -30,34 +30,32 @@ pub struct Claims {
     pub sub: String, // Optional. Subject (whom token refers to)
 }
 
-pub async fn authenticate_user<B>(
-    mut req: Request<B>,
-    next: Next<B>,
-    // database: Database,
-) -> Result<Response, StatusCode> {
-    // note
-    // https://docs.rs/axum/latest/axum/middleware/index.html#sharing-state-between-handlers-and-middleware
+pub async fn verify_token<B>(mut req: Request<B>, next: Next<B>) -> Result<Response, StatusCode> {
     let authorization = req
         .headers()
         .get(http::header::AUTHORIZATION)
-        .and_then(|header| header.to_str().ok())
-        .unwrap();
-    // if let Some(authorization) = authorization {
-    //     let claims = verify_token(authorization).await.unwrap();
-    // }
-    let token = verify_token(authorization).await.unwrap();
-    req.extensions_mut().insert(token.claims);
-    Ok(next.run(req).await)
+        .and_then(|header| header.to_str().ok());
+    println!("authorization: {:?}", authorization);
+    if let Some(authorization) = authorization {
+        let result = decode_token(authorization).await;
+        if let Ok(token) = result {
+            req.extensions_mut().insert(Some(token.claims));
+            Ok(next.run(req).await)
+        } else {
+            Err(StatusCode::UNAUTHORIZED)
+        }
+    } else {
+        req.extensions_mut().insert(None as Option<Claims>);
+        Ok(next.run(req).await)
+    }
 }
 
-async fn verify_token(token: &str) -> Result<TokenData<Claims>, Box<dyn Error>> {
+async fn decode_token(token: &str) -> Result<TokenData<Claims>, jsonwebtoken::errors::Error> {
     // https://github.com/tokio-rs/axum/blob/main/examples/jwt/src/main.rs
     let key = fetch_key(token).await.unwrap();
     let components = &DecodingKey::from_rsa_components(&key.n, &key.e).unwrap();
     let validation = &Validation::new(Algorithm::RS256);
-    let token = decode::<Claims>(token, components, validation).unwrap();
-    println!("token: {:?}", token);
-    Ok(token)
+    decode::<Claims>(token, components, validation)
 }
 
 async fn fetch_key(token: &str) -> Result<RSAKey, Box<dyn Error>> {
@@ -72,7 +70,7 @@ async fn fetch_key(token: &str) -> Result<RSAKey, Box<dyn Error>> {
     let url = format!(
         "https://cognito-idp.{}.amazonaws.com/{}/.well-known/jwks.json",
         std::env::var("AWS_REGION").unwrap(),
-        std::env::var("AWS_COGNITO_USER_POOL_ID").unwrap(),
+        std::env::var("AWS_COGNITO_USER_POOL_ID")?,
     );
     let response: reqwest::Response = reqwest::get(url).await?;
     let jwks: JWKs = response.json().await?;
