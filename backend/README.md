@@ -7,6 +7,7 @@
 - [axum](https://github.com/tokio-rs/axum)
 - [async-graphql](https://github.com/async-graphql/async-graphql)
 - [sea-orm](https://github.com/SeaQL/sea-orm)
+- [aws-sdk-rust](https://github.com/awslabs/aws-sdk-rust)
 
 ## Tutorial
 

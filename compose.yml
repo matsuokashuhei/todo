@@ -4,7 +4,7 @@ services:
     build:
       context: .
       dockerfile: frontend/.devcontainer/Dockerfile
-    command: sleep infinity
+    command: yarn run dev
     depends_on:
       - backend
     env_file:

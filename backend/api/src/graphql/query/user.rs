@@ -1,5 +1,5 @@
+use crate::authority;
 use async_graphql::{Context, Object, Result};
-// use crate::db::Database;
 use repository::{async_graphql, db::Database, user};
 use sea_orm::EntityTrait;
 
@@ -9,6 +9,9 @@ pub struct UserQuery;
 #[Object]
 impl UserQuery {
     async fn users(&self, ctx: &Context<'_>) -> Result<Vec<user::Model>> {
+        let claims = ctx.data::<authority::Claims>().unwrap();
+        println!("claims: {:?}", claims);
+        println!("sub: {:?}", claims.sub);
         let db = ctx.data::<Database>().unwrap();
         let conn = db.get_connection();
         Ok(user::Entity::find()
