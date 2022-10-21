@@ -1,7 +1,7 @@
 use crate::authority::Claims;
 use async_graphql::{Context, Object, Result};
 use repository::{async_graphql, db::Database, user};
-use sea_orm::EntityTrait;
+use sea_orm::{DbErr, EntityTrait};
 
 #[derive(Default)]
 pub struct UserQuery;
@@ -21,10 +21,19 @@ impl UserQuery {
             .await
             .map_err(|e| e.to_string())?)
     }
-    async fn user(&self, ctx: &Context<'_>, id: i32) -> Result<Option<user::Model>> {
+    async fn user(&self, ctx: &Context<'_>, id: i32) -> Result<user::Model> {
         let db = ctx.data::<Database>().unwrap();
         let conn = db.get_connection();
-        Ok(user::Entity::find_by_id(id).one(conn).await?)
+        let user = user::Entity::find_by_id(id)
+            .one(conn)
+            .await
+            .map_err(|e| e.to_string())?;
+        match user {
+            Some(user) => Ok(user),
+            None => Err(async_graphql::Error::new(
+                DbErr::RecordNotFound(id.to_string()).to_string(),
+            )),
+        }
     }
 }
 

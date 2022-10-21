@@ -29,20 +29,20 @@ impl UserMutation {
         &self,
         ctx: &Context<'_>,
         input: CreateUserInput,
-    ) -> Result<user::Model, DbErr> {
+    ) -> Result<user::Model> {
         let db = ctx.data::<Database>().unwrap();
         let conn = db.get_connection();
         let active_model = user::ActiveModel {
             name: Set(input.name.to_owned()),
             ..Default::default()
         };
-        let res = user::Entity::insert(active_model).exec(conn).await;
-        match res {
-            Ok(res) => Ok(user::Model {
-                id: res.last_insert_id,
-                name: input.name,
-            }),
-            Err(e) => Err(e),
-        }
+        let result = user::Entity::insert(active_model)
+            .exec(conn)
+            .await
+            .map_err(|e| e.to_string())?;
+        Ok(user::Model {
+            id: result.last_insert_id,
+            name: input.name,
+        })
     }
 }
