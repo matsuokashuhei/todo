@@ -4,7 +4,9 @@ use axum::{
     response::Response,
 };
 use jsonwebtoken::{
-    decode, decode_header, errors::Error, Algorithm, DecodingKey, TokenData, Validation,
+    decode, decode_header,
+    errors::{Error, ErrorKind},
+    Algorithm, DecodingKey, TokenData, Validation,
 };
 use serde::{Deserialize, Serialize};
 
@@ -51,22 +53,27 @@ pub async fn verify_token<B>(mut req: Request<B>, next: Next<B>) -> Result<Respo
     }
 }
 
-async fn decode_token(token: &str) -> Result<TokenData<Claims>, jsonwebtoken::errors::Error> {
+async fn decode_token(token: &str) -> Result<TokenData<Claims>, Error> {
     // https://github.com/tokio-rs/axum/blob/main/examples/jwt/src/main.rs
-    let key = fetch_key(token).await.unwrap();
-    let components = &DecodingKey::from_rsa_components(&key.n, &key.e).unwrap();
+    let key = fetch_key(token).await?;
+    let components = &DecodingKey::from_rsa_components(&key.n, &key.e)?;
     let validation = &Validation::new(Algorithm::RS256);
     decode::<Claims>(token, components, validation)
 }
 
-async fn fetch_key(token: &str) -> Result<RSAKey, Box<Error>> {
+async fn fetch_key(token: &str) -> Result<RSAKey, Error> {
     // Vaildating a JSON web token
     // https://docs.aws.amazon.com/ja_jp/cognito/latest/developerguide/amazon-cognito-user-pools-using-tokens-verifying-a-jwt.html
     //
     // Code examples
     // - https://github.com/rib/jsonwebtokens-cognito/blob/master/src/lib.rs
     // - https://github.com/Keats/jsonwebtoken
-    let kid = decode_header(token).unwrap().kid.unwrap();
+    // let kid = decode_header(token).unwrap().kid.unwrap();
+    let header = decode_header(token)?;
+    let kid = match header.kid {
+        Some(kid) => kid,
+        None => return Err(Error::from(ErrorKind::InvalidToken)),
+    };
     println!("kid: {:?}", kid);
     let url = format!(
         "https://cognito-idp.{}.amazonaws.com/{}/.well-known/jwks.json",
@@ -79,10 +86,9 @@ async fn fetch_key(token: &str) -> Result<RSAKey, Box<Error>> {
     let key = jwks
         .keys
         .into_iter()
-        .find(|key| key.alg == "RS256" && key.kid == kid)
-        .unwrap();
-    println!("key: {:?}", key);
-    Ok(key)
-    // let key = &DecodingKey::from_rsa_components(&key.n, &key.e).unwrap();
-    // Ok(key)
+        .find(|key| key.alg == "RS256" && key.kid == kid);
+    match key {
+        Some(key) => Ok(key),
+        None => Err(Error::from(ErrorKind::InvalidToken)),
+    }
 }
