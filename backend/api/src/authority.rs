@@ -3,9 +3,10 @@ use axum::{
     middleware::Next,
     response::Response,
 };
-use jsonwebtoken::{decode, decode_header, Algorithm, DecodingKey, TokenData, Validation};
+use jsonwebtoken::{
+    decode, decode_header, errors::Error, Algorithm, DecodingKey, TokenData, Validation,
+};
 use serde::{Deserialize, Serialize};
-use std::error::Error;
 
 #[derive(Debug, Deserialize)]
 struct JWKs {
@@ -58,7 +59,7 @@ async fn decode_token(token: &str) -> Result<TokenData<Claims>, jsonwebtoken::er
     decode::<Claims>(token, components, validation)
 }
 
-async fn fetch_key(token: &str) -> Result<RSAKey, Box<dyn Error>> {
+async fn fetch_key(token: &str) -> Result<RSAKey, Box<Error>> {
     // Vaildating a JSON web token
     // https://docs.aws.amazon.com/ja_jp/cognito/latest/developerguide/amazon-cognito-user-pools-using-tokens-verifying-a-jwt.html
     //
@@ -70,10 +71,10 @@ async fn fetch_key(token: &str) -> Result<RSAKey, Box<dyn Error>> {
     let url = format!(
         "https://cognito-idp.{}.amazonaws.com/{}/.well-known/jwks.json",
         std::env::var("AWS_REGION").unwrap(),
-        std::env::var("AWS_COGNITO_USER_POOL_ID")?,
+        std::env::var("AWS_COGNITO_USER_POOL_ID").unwrap(),
     );
-    let response: reqwest::Response = reqwest::get(url).await?;
-    let jwks: JWKs = response.json().await?;
+    let response: reqwest::Response = reqwest::get(url).await.unwrap();
+    let jwks: JWKs = response.json().await.unwrap();
     println!("jwks: {:?}", jwks);
     let key = jwks
         .keys
