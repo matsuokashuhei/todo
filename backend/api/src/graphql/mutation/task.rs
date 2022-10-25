@@ -1,3 +1,4 @@
+use crate::authority::Claims;
 use async_graphql::{Context, Object, Result};
 use repository::{
     async_graphql::{self, InputObject},
@@ -8,17 +9,16 @@ use sea_orm::{ActiveValue, EntityTrait};
 
 #[derive(InputObject)]
 pub struct CreateTaskInput {
-    pub user_id: i32,
     pub title: String,
     pub description: String,
 }
 
 impl CreateTaskInput {
-    fn into_active_model(self) -> task::ActiveModel {
+    fn into_active_model(self, user_sub: String) -> task::ActiveModel {
         task::ActiveModel {
-            user_id: ActiveValue::Set(self.user_id.to_owned()),
-            title: ActiveValue::Set(self.title.to_owned()),
-            description: ActiveValue::Set(self.description.to_owned()),
+            user_sub: ActiveValue::Set(user_sub),
+            title: ActiveValue::Set(self.title),
+            description: ActiveValue::Set(self.description),
             ..Default::default()
         }
     }
@@ -35,12 +35,10 @@ impl UpdateTaskInput {
     fn into_active_model(self) -> task::ActiveModel {
         task::ActiveModel {
             id: ActiveValue::Set(self.id),
-            title: self
-                .title
-                .map_or(ActiveValue::NotSet, |title| ActiveValue::Set(title)),
-            description: self.description.map_or(ActiveValue::NotSet, |description| {
-                ActiveValue::Set(description)
-            }),
+            title: self.title.map_or(ActiveValue::NotSet, ActiveValue::Set),
+            description: self
+                .description
+                .map_or(ActiveValue::NotSet, ActiveValue::Set),
             ..Default::default() // ..Default::default(),
         }
     }
@@ -61,19 +59,24 @@ impl TaskMutation {
         ctx: &Context<'_>,
         input: CreateTaskInput,
     ) -> Result<task::Model> {
-        let db = ctx.data::<Database>().unwrap();
-        let conn = db.get_connection();
-        let active_model = input.into_active_model();
-        let result = task::Entity::insert(active_model)
-            .exec(conn)
-            .await
-            .map_err(|e| e.to_string())?;
-        Ok(task::Entity::find_by_id(result.last_insert_id)
-            .one(conn)
-            .await
-            .map_err(|e| e.to_string())
-            .unwrap()
-            .unwrap())
+        let claims = ctx.data_opt::<Claims>();
+        if let Some(claims) = claims {
+            let db = ctx.data::<Database>().unwrap();
+            let conn = db.get_connection();
+            let active_model = input.into_active_model(claims.sub.to_owned());
+            let result = task::Entity::insert(active_model)
+                .exec(conn)
+                .await
+                .map_err(|e| e.to_string())?;
+            Ok(task::Entity::find_by_id(result.last_insert_id)
+                .one(conn)
+                .await
+                .map_err(|e| e.to_string())
+                .unwrap()
+                .unwrap())
+        } else {
+            Err(async_graphql::Error::new("Unauthorized"))
+        }
     }
     pub async fn update_task(
         &self,
