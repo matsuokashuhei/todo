@@ -1,18 +1,18 @@
+# syntax=docker/dockerfile:1.3-labs
+
+FROM rust:1.64.0
+
+RUN <<EOT
+rustup component add rustfmt clippy
+cargo install cargo-watch sea-orm-cli
+EOT
+
 # # syntax=docker/dockerfile:1.3-labs
 
 # FROM rust:1.64.0
 
-# RUN <<EOT
-# rustup component add rustfmt clippy
-# cargo install cargo-watch sea-orm-cli
-# EOT
-
-# # syntax=docker/dockerfile:1.3-labs
-
-FROM rust:1.64.0
-
-RUN rustup component add rustfmt clippy \
- && cargo install cargo-watch sea-orm-cli
+# RUN rustup component add rustfmt clippy \
+#  && cargo install cargo-watch sea-orm-cli
 
 # ENV sourcedir=backend
 # ENV workdir=/app/backend

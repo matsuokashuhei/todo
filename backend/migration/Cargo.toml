@@ -21,4 +21,4 @@ features = [
   "sqlx-mysql",
   "runtime-tokio-native-tls",
 ]
-version = "^0.9.0"
+version = "0.10.0"

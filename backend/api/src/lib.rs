@@ -24,7 +24,6 @@ async fn graphql_handler(
     } else {
         schema.execute(req.into_inner()).await.into()
     }
-    // req.0.data(claims)
 }
 
 async fn graphql_playground() -> impl IntoResponse {
