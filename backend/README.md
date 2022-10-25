@@ -9,9 +9,10 @@
 - [sea-orm](https://github.com/SeaQL/sea-orm)
 - [aws-sdk-rust](https://github.com/awslabs/aws-sdk-rust)
 
-## Tutorial
-
+## Code examples
 - [Rust Async-GraphQL Example: Caster API](https://github.com/bkonkle/rust-example-caster-api)
+- [Rust Cookbook](https://rust-lang-nursery.github.io/rust-cookbook/intro.html)
+- [rongcuid/gqlforum-rs](https://github.com/rongcuid/gqlforum-rs)
 
 # ER diagram
 

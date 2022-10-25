@@ -15,4 +15,4 @@ serde = {version = "1.0.85", features = ["derive"]}
 version = "4.0"
 
 [dependencies.sea-orm]
-version = "0.9.3"
+version = "0.10.0"

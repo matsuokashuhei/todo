@@ -10,7 +10,7 @@ async-graphql-axum = "4.0"
 axum = {version = "0.5.16", features = ["ws", "headers"]}
 http = "0.2.8"
 hyper = "0.14.20"
-sea-orm = {version = "0.9.3", features = ["debug-print", "sqlx-mysql", "runtime-tokio-native-tls", "macros"]}
+sea-orm = {version = "0.10.0", features = ["debug-print", "sqlx-mysql", "runtime-tokio-native-tls", "macros"]}
 # serde = {version = "1.0.85", features = ["derive"]}
 # serde_json = "1.0.85"
 aws-config = {git = "https://github.com/awslabs/aws-sdk-rust", branch = "main"}

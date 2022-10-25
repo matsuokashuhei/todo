@@ -1,10 +1,12 @@
-use async_graphql::SimpleObject;
+use crate::db::Database;
+use crate::user;
+use async_graphql::{ComplexObject, Context, Result, SimpleObject};
 use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel, Serialize, Deserialize, SimpleObject)]
 #[sea_orm(table_name = "tasks")]
-#[graphql(concrete(name = "Task", params()))]
+#[graphql(complex, name = "Task")]
 pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i32,
@@ -13,24 +15,20 @@ pub struct Model {
     pub user_id: i32,
 }
 
-// #[derive(Copy, Clone, Debug, EnumIter, DeriveColumn)]
-// pub enum Column {
-//     Id,
-//     Title,
-//     Description,
-//     UserId,
-// }
-
-// impl ColumnTrait for Column {
-//     fn def(&self) -> ColumnDef {
-//         match self {
-//             Self::Id => ColumnType::Integer.def(),
-//             Self::Title => ColumnType::String(()).def(),
-//             Self::Description => ColumnType::String(()).def(),
-//             Self::UserId => ColumnType::Integer.def(),
-//         }
-//     }
-// }
+#[ComplexObject]
+impl Model {
+    pub async fn user(&self, ctx: &Context<'_>) -> Result<user::Model> {
+        let db = ctx.data::<Database>().unwrap();
+        let conn = db.get_connection();
+        Ok(self
+            .find_related(user::Entity)
+            .one(conn)
+            .await
+            .map_err(|e| e.to_string())
+            .unwrap()
+            .unwrap())
+    }
+}
 
 #[derive(Copy, Clone, Debug, EnumIter)]
 pub enum Relation {
@@ -53,13 +51,11 @@ impl Related<super::user::Entity> for Entity {
         Relation::User.def()
     }
 }
-// #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, SimpleObject)]
-// #[sea_orm(table_name = "tasks")]
-// pub struct Model {
-//     #[sea_orm(primary_key)]
-//     pub id: i32,
-//     pub title: String,
-//     pub description: String,
-// }
 
 impl ActiveModelBehavior for ActiveModel {}
+
+impl Entity {
+    pub fn find_by_user_id(user_id: i32) -> Select<Entity> {
+        Self::find().filter(Column::UserId.eq(user_id))
+    }
+}
